@@ -196,6 +196,9 @@ public class CompileSassMojo extends AbstractMojo {
     @Parameter(defaultValue = "../")
     private String airlineList;
 
+    @Parameter(defaultValue = "true")
+    private boolean isLowerCase;
+
     public void execute() throws MojoExecutionException {
         extractExecutable();
 
@@ -250,18 +253,23 @@ public class CompileSassMojo extends AbstractMojo {
         if (airlineList != null){
             String[] airlinesU= airlineList.toUpperCase().split(",");
             String[] airlinesL= airlineList.toLowerCase().split(",");
-            for (String airline : airlinesU) {
-                File airlineUFile =new File(inputFolder,airline);
-                File outputFile=new File(outputFolder,airline);
-                sassCommandBuilder.withPaths(airlineUFile.toPath(),outputFile.toPath());
-                getLog().info(airlineUFile.toString());
+            if (isLowerCase){
+                for (String airline : airlinesL) {
+                    File airlineLFile =new File(inputFolder,airline);
+                    File outputFile=new File(outputFolder,airline);
+                    sassCommandBuilder.withPaths(airlineLFile.toPath(),outputFile.toPath());
+                    getLog().info(airlineLFile.toString());
+                }
+            }else{
+                for (String airline : airlinesU) {
+                    File airlineUFile =new File(inputFolder,airline);
+                    File outputFile=new File(outputFolder,airline);
+                    sassCommandBuilder.withPaths(airlineUFile.toPath(),outputFile.toPath());
+                    getLog().info(airlineUFile.toString());
+                }
             }
-            for (String airline : airlinesL) {
-                File airlineLFile =new File(inputFolder,airline);
-                File outputFile=new File(outputFolder,airline);
-                sassCommandBuilder.withPaths(airlineLFile.toPath(),outputFile.toPath());
-                getLog().info(airlineLFile.toString());
-            }
+            
+            
         }
 
         setOptions();
