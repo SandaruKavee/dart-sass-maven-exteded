@@ -252,21 +252,23 @@ public class CompileSassMojo extends AbstractMojo {
             String[] airlinesL= airlineList.toLowerCase().split(",");
             for (String airline : airlinesU) {
                 File airlineUFile =new File(inputFolder,airline);
-                sassCommandBuilder.withLoadPath(airlineUFile.toPath());
+                File outputFile=new File(outputFolder,airline);
+                sassCommandBuilder.withPaths(airlineUFile.toPath(),outputFile.toPath());
                 getLog().info(airlineUFile.toString());
             }
             for (String airline : airlinesL) {
                 File airlineLFile =new File(inputFolder,airline);
-                sassCommandBuilder.withLoadPath(airlineLFile.toPath());
+                File outputFile=new File(outputFolder,airline);
+                sassCommandBuilder.withPaths(airlineLFile.toPath(),outputFile.toPath());
                 getLog().info(airlineLFile.toString());
             }
         }
 
         setOptions();
 
-        Path inputFolderPath = inputFolder.toPath();
+        // Path inputFolderPath = inputFolder.toPath();
 
-        sassCommandBuilder.withPaths(inputFolderPath, outputFolder.toPath());
+        // sassCommandBuilder.withPaths(inputFolderPath, outputFolder.toPath());
 
         try {
             return sassCommandBuilder.build();
