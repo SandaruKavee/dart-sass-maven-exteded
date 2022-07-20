@@ -193,7 +193,7 @@ public class CompileSassMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     private boolean trace;
 
-    @Parameter(defaultValue = "./")
+    @Parameter(defaultValue = "../")
     private String airlineList;
 
     public void execute() throws MojoExecutionException {
@@ -215,7 +215,7 @@ public class CompileSassMojo extends AbstractMojo {
             try {
                 long fileCount = fileCounter.getProcessableFileCount(inputFolder.toPath());
 
-                getLog().info("Compiled " + fileCount + " files in " + elapsedTime + " ms");
+                getLog().info("Compiled " + fileCount + " files in "+airlineList +" "+ elapsedTime + " ms");
             } catch (FileCounterException fileCounterException) {
                 throw new MojoExecutionException("Error while obtaining file count: ", fileCounterException);
             }
@@ -245,6 +245,20 @@ public class CompileSassMojo extends AbstractMojo {
         if (loadPaths != null) {
             for (File loadPath : loadPaths) {
                 sassCommandBuilder.withLoadPath(loadPath.toPath());
+            }
+        }
+        if (airlineList != null){
+            String[] airlinesU= airlineList.toUpperCase().split(",");
+            String[] airlinesL= airlineList.toLowerCase().split(",");
+            for (String airline : airlinesU) {
+                File airlineUFile =new File(inputFolder,airline);
+                sassCommandBuilder.withLoadPath(airlineUFile.toPath());
+                getLog().info(airlineUFile.toString());
+            }
+            for (String airline : airlinesL) {
+                File airlineLFile =new File(inputFolder,airline);
+                sassCommandBuilder.withLoadPath(airlineLFile.toPath());
+                getLog().info(airlineLFile.toString());
             }
         }
 
@@ -284,6 +298,14 @@ public class CompileSassMojo extends AbstractMojo {
 
     public void setInputFolder(File inputFolder) {
         this.inputFolder = inputFolder;
+    }
+
+    public String getAirlineList(){
+        return airlineList;
+    }
+
+    public void setAirlineList(String airlineList){
+        this.airlineList =airlineList;
     }
 
     public File getOutputFolder() {
