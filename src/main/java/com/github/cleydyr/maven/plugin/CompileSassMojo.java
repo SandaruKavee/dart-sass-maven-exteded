@@ -193,7 +193,7 @@ public class CompileSassMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     private boolean trace;
 
-    @Parameter(defaultValue = "../")
+    @Parameter(defaultValue = "all")
     private String airlineList;
 
     @Parameter(defaultValue = "true")
@@ -218,7 +218,7 @@ public class CompileSassMojo extends AbstractMojo {
             try {
                 long fileCount = fileCounter.getProcessableFileCount(inputFolder.toPath());
 
-                getLog().info("Compiled " + fileCount + " files in "+airlineList +" "+ elapsedTime + " ms");
+                getLog().info("Compiled " + " files in "+airlineList +" "+ elapsedTime + " ms");
             } catch (FileCounterException fileCounterException) {
                 throw new MojoExecutionException("Error while obtaining file count: ", fileCounterException);
             }
@@ -250,33 +250,38 @@ public class CompileSassMojo extends AbstractMojo {
                 sassCommandBuilder.withLoadPath(loadPath.toPath());
             }
         }
-        if (airlineList != null){
-            String[] airlinesU= airlineList.toUpperCase().split(",");
-            String[] airlinesL= airlineList.toLowerCase().split(",");
-            if (isLowerCase){
-                for (String airline : airlinesL) {
-                    File airlineLFile =new File(inputFolder,airline);
-                    File outputFile=new File(outputFolder,airline);
-                    sassCommandBuilder.withPaths(airlineLFile.toPath(),outputFile.toPath());
-                    getLog().info(airlineLFile.toString());
-                }
+        if (airlineList !=  null){
+            if (airlineList.equals("all")  ){
+                        Path inputFolderPath = inputFolder.toPath();
+
+                        sassCommandBuilder.withPaths(inputFolderPath, outputFolder.toPath());
             }else{
-                for (String airline : airlinesU) {
-                    File airlineUFile =new File(inputFolder,airline);
-                    File outputFile=new File(outputFolder,airline);
-                    sassCommandBuilder.withPaths(airlineUFile.toPath(),outputFile.toPath());
-                    getLog().info(airlineUFile.toString());
+                String[] airlinesU= airlineList.toUpperCase().split(",");
+                String[] airlinesL= airlineList.toLowerCase().split(",");
+                if (isLowerCase){
+                    for (String airline : airlinesL) {
+                        File airlineLFile =new File(inputFolder,airline);
+                        File outputFile=new File(outputFolder,airline);
+                        sassCommandBuilder.withPaths(airlineLFile.toPath(),outputFile.toPath());
+                        getLog().info(airlineLFile.toString());
+                    }
+                }else{
+                    for (String airline : airlinesU) {
+                        File airlineUFile =new File(inputFolder,airline);
+                        File outputFile=new File(outputFolder,airline);
+                        sassCommandBuilder.withPaths(airlineUFile.toPath(),outputFile.toPath());
+                        getLog().info(airlineUFile.toString());
+                    }
                 }
+                
+                
             }
-            
-            
-        }
+            }
+           
 
         setOptions();
 
-        // Path inputFolderPath = inputFolder.toPath();
 
-        // sassCommandBuilder.withPaths(inputFolderPath, outputFolder.toPath());
 
         try {
             return sassCommandBuilder.build();
